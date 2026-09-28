@@ -48,3 +48,26 @@ do
   assert(s2.slices[1].bounds == bounds[1])
   assert(s2.slices[2].bounds == bounds[2])
 end
+
+-- Keys per frame
+do
+  local s = Sprite(32, 32)
+  s:newEmptyFrame()
+  s:newEmptyFrame()
+  local slice = s:newSlice(Rectangle(0, 0, 4, 4))
+
+  slice:setKey(2, { bounds=Rectangle(2, 3, 4, 4), pivot=Point(1, 1) })
+  slice:setKey(s.frames[3], { bounds=Rectangle(5, 6, 4, 4) })
+
+  assert(slice:getKey(1).bounds == Rectangle(0, 0, 4, 4))
+  assert(slice:getKey(1).pivot == nil)
+  assert(slice:getKey(2).bounds == Rectangle(2, 3, 4, 4))
+  assert(slice:getKey(2).pivot == Point(1, 1))
+  -- A key keeps the fields that were not set from the key before it.
+  assert(slice:getKey(3).bounds == Rectangle(5, 6, 4, 4))
+  assert(slice:getKey(3).pivot == Point(1, 1))
+  -- The bounds property still reads the first frame's key.
+  assert(slice.bounds == Rectangle(0, 0, 4, 4))
+
+  assert(not pcall(function() slice:setKey(4, { bounds=Rectangle(0, 0, 1, 1) }) end))
+end
